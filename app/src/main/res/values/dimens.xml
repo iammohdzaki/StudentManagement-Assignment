@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+    <!-- Main Activity -->
+    <dimen name="padding_add_btn">15dp</dimen>
+    <dimen name="btn_text_size">16sp</dimen>
+    <dimen name="margin_top_empty_image">12dp</dimen>
+    <dimen name="empty_image_width">120dp</dimen>
+    <dimen name="empty_image_height">120dp</dimen>
+
+    <!--Editor Activity Dimensions-->
+    <dimen name="iv_image_width">144dp</dimen>
+    <dimen name="iv_image_height">144dp</dimen>
+    <dimen name="linear_layout_padding">18dp</dimen>
+    <dimen name="iv_margin_top">8dp</dimen>
+    <dimen name="til_margin_1">20dp</dimen>
+    <dimen name="til_padding_top">4dp</dimen>
+    <dimen name="til_margin_2">20dp</dimen>
+    <dimen name="btn_width">140dp</dimen>
+    <dimen name="btn_margin_left">8dp</dimen>
+    <dimen name="btn_margin_top">25dp</dimen>
+    <dimen name="btn_margin_right">8dp</dimen>
+
+    <!--Details View Format Dimensions-->
+    <dimen name="tv_name_margin_bottom">6dp</dimen>
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="row_padding_vertical">8dp</dimen>
+    <dimen name="margin_layout">4dp</dimen>
+    <dimen name="tv_text_size">16sp</dimen>
+
+    <!--Switch Dimensions-->
+    <dimen name="switch_margin">8dp</dimen>
+
+</resources>

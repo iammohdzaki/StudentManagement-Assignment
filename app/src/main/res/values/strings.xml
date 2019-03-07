@@ -1,0 +1,41 @@
+<resources>
+    <string name="app_name">StudentRecord</string>
+    <string name="add_student">Add Student</string>
+    <string name="err_msg_name">Enter your full name</string>
+    <string name="err_msg_id">Enter valid ID</string>
+    <string name="unique_id_err">ID must be Unique</string>
+    <string name="name_format_err">Name Must be Characters</string>
+
+    <!--Array List For Dialog Operation when Recycler View is Clicked!-->
+    <string-array name="Dialog_Operations">
+        <item>View</item>
+        <item>Edit</item>
+        <item>Delete</item>
+    </string-array>
+    
+    
+    <!--Delete Dialog Strings-->
+    <string name="delete_message">Are you sure to delete this entry?</string>
+    <string name="delete_title">Delete Entry</string>
+    <string name="positive_option">Yes</string>
+    <string name="negative_option">No</string>
+    <string name="delete_all_dialog">Are you sure to delete all records?</string>
+    <string name="delete_all_positive_text">Delete Anyway</string>
+    <string name="et_hint_name">Name</string>
+    <string name="et_hint_roll">Roll Number</string>
+    <string name="btn_text">Save</string>
+    <string name="menu_delete_all">Delete All</string>
+    <string name="menu_filter">Filter</string>
+    <string name="menu_sort_name">Sort by Name</string>
+    <string name="menu_sort_id">Sort by ID</string>
+    <string name="menu_switch">Switch View</string>
+    <string name="activity_title_add">Add Student</string>
+    <string name="btn_update">Update</string>
+    <string name="activity_title_update">Update Student</string>
+
+
+    <string-array name="spinner_list_item_array">
+        <item>A-Z</item>
+        <item>0-9</item>
+    </string-array>
+</resources>
