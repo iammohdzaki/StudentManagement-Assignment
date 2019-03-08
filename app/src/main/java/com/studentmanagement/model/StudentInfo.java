@@ -1,4 +1,4 @@
-package com.studentmanagement.Model;
+package com.studentmanagement.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;

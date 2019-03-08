@@ -1,4 +1,4 @@
-package com.studentmanagement.Activity;
+package com.studentmanagement.activity;
 
 import android.content.Intent;
 import android.support.design.widget.TextInputLayout;
@@ -10,12 +10,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.studentmanagement.Model.StudentInfo;
+import com.studentmanagement.model.StudentInfo;
 import com.studentmanagement.R;
-import com.studentmanagement.Validator.CustomTextWatcher;
-import com.studentmanagement.Validator.Validator;
+import com.studentmanagement.validator.CustomTextWatcher;
+import com.studentmanagement.validator.Validator;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
 
 
 public class EditorActivity extends AppCompatActivity {
@@ -45,7 +47,9 @@ public class EditorActivity extends AppCompatActivity {
         mSaveButton = (Button) findViewById(R.id.btn_save_data);
 
         final Intent intent = getIntent();
-        StudentInfo mStudentInfo=intent.getParcelableExtra("MODE_TYPE");
+        final ArrayList<StudentInfo> mStudentList=intent.getParcelableArrayListExtra("STUDENT_LIST");
+
+        final String id=intent.getStringExtra("STUDENT_ID");
         setTitle(R.string.activity_title_add);
 
         if (intent.getStringExtra(MODETYPE).equals("NORMAL")) {
@@ -53,42 +57,44 @@ public class EditorActivity extends AppCompatActivity {
             mSaveButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    saveDataMode();
+                    saveDataMode(mStudentList);
                 }
             });
         } else if (intent.getStringExtra(MODETYPE).equals("UPDATE")) {
             mSaveButton.setText(getString(R.string.btn_update));
             setTitle(R.string.activity_title_update);
-            fillData(mNameInfo, mIdInfo, mStudentInfo);
+            fillData(mNameInfo, mIdInfo, intent);
             mSaveButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    updateMode(intent);
+                    updateMode(id,mStudentList);
                 }
             });
         } else if (intent.getStringExtra(MODETYPE).equals("VIEW")) {
             viewMode(mNameInfo, mIdInfo);
-            fillData(mNameInfo, mIdInfo, mStudentInfo);
+            fillData(mNameInfo, mIdInfo, intent);
         }
 
     }
 
     // When activity is opened in normal mode i.e Saves New Student Data
-    public void saveDataMode() {
+    public void saveDataMode(ArrayList<StudentInfo> mStudentList) {
+        Intent sendBack = new Intent();
         //Validate Name i.e No special Character and numbers
-        if (!Validator.validateName(mNameInfo.getText().toString().trim())) {
+        if (!Validator.validateName(getNameEditText())) {
             nameTextInput.setError(getString(R.string.err_msg_name));
             requestFocus(nameTextInput);
             return;
         }
         //Validate ID or Roll Number
-        if (!Validator.validateID(mIdInfo.getText().toString().trim())) {
+        if (!Validator.validateId(getIdEditText())) {
             rollTextInput.setError(getString(R.string.err_msg_id));
             requestFocus(mIdInfo);
             return;
         }
+
         //Validate Unique ID
-        if (!Validator.uniqueID(mIdInfo.getText().toString().trim())) {
+        if (!Validator.uniqueId(getIdEditText(),mStudentList)) {
             rollTextInput.setError(getString(R.string.unique_id_err));
             requestFocus(mIdInfo);
             return;
@@ -98,7 +104,6 @@ public class EditorActivity extends AppCompatActivity {
         rollTextInput.setErrorEnabled(false);
 
         Toast.makeText(EditorActivity.this, "Data Saved", Toast.LENGTH_LONG).show();
-        Intent sendBack = new Intent();
         sendBack.putExtra("ID", mIdInfo.getText().toString());
         sendBack.putExtra("NAME", mNameInfo.getText().toString());
         setResult(1, sendBack);
@@ -106,10 +111,11 @@ public class EditorActivity extends AppCompatActivity {
     }
 
     // Populate the Edit Text Field in Case of Edit and View Mode
-    public void fillData(EditText mName, EditText mID, StudentInfo mStudentInfo) {
+    public void fillData(EditText mName, EditText mID, Intent intent) {
         setTitle("Student Details");
-        mName.setText(mStudentInfo.getName());
-        mID.setText(mStudentInfo.getID());
+
+        mName.setText(intent.getStringExtra("STUDENT_NAME"));
+        mID.setText(intent.getStringExtra("STUDENT_ID"));
     }
 
     // Show Data in View Mode
@@ -121,42 +127,52 @@ public class EditorActivity extends AppCompatActivity {
         mSaveButton.setVisibility(View.INVISIBLE);
     }
 
+
+    @NotNull
+    private String getNameEditText(){
+        return mNameInfo.getText().toString().trim();
+    }
+
+    @NotNull
+    private String getIdEditText(){
+        return mIdInfo.getText().toString().trim();
+    }
     //When the activity opened in UPDATE or EDIT MODE
-    public void updateMode(Intent intent) {
-        Intent sendBack = new Intent();
+    public void updateMode(String id,ArrayList<StudentInfo> mStudentList) {
+
         //Validate Name i.e No special Character and numbers
-        if (!Validator.validateName(mNameInfo.getText().toString().trim())) {
+        if (!Validator.validateName(getNameEditText())) {
             nameTextInput.setError(getString(R.string.err_msg_name));
             requestFocus(nameTextInput);
             return;
         }
         //Validate ID or Roll Number
-        if (!Validator.validateID(mIdInfo.getText().toString().trim())) {
+        if (!Validator.validateId(getIdEditText())) {
             rollTextInput.setError(getString(R.string.err_msg_id));
             requestFocus(mIdInfo);
             return;
         }
 
-        //Validate Unique ID
-        String ID = intent.getStringExtra("VIEW_ID");
-        if (ID.equals(mIdInfo.getText().toString())) {
+        /*
+        if (id.equals(mIdInfo.getText().toString())) {
 
         } else {
-            if (!Validator.uniqueID(mIdInfo.getText().toString().trim())) {
+            if (!Validator.uniqueId(getIdEditText(),mStudentList)) {
                 rollTextInput.setError(getString(R.string.unique_id_err));
                 requestFocus(mIdInfo);
                 return;
             }
-        }
+        }*/
 
         nameTextInput.setErrorEnabled(false);
         rollTextInput.setErrorEnabled(false);
 
+        Intent sendBack =new Intent();
         Toast.makeText(EditorActivity.this, "Data Updated", Toast.LENGTH_LONG).show();
 
         //Add Updated data to Intent
-        sendBack.putExtra("ID", mIdInfo.getText().toString());
-        sendBack.putExtra("NAME", mNameInfo.getText().toString());
+        sendBack.putExtra("ID",getIdEditText());
+        sendBack.putExtra("NAME",getNameEditText());
         setResult(2, sendBack);
         finish();
     }

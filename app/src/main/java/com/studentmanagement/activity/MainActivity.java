@@ -1,4 +1,4 @@
-package com.studentmanagement.Activity;
+package com.studentmanagement.activity;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -10,7 +10,6 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,18 +19,17 @@ import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.Toast;
 
-import com.studentmanagement.Adapter.StudentAdapter;
-import com.studentmanagement.Comparator.ComparatorID;
-import com.studentmanagement.Comparator.ComparatorName;
+import com.studentmanagement.adapter.StudentAdapter;
+import com.studentmanagement.comparator.ComparatorID;
+import com.studentmanagement.comparator.ComparatorName;
 import com.studentmanagement.R;
-import com.studentmanagement.TouchListener.RecyclerTouchListener;
-import com.studentmanagement.Model.StudentInfo;
+import com.studentmanagement.touchListener.RecyclerTouchListener;
+import com.studentmanagement.model.StudentInfo;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -40,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     public final static int DELETE=2;
     public final static int SAVERESULTCODE=1;
     public final static int UPDATERESULTCODE=2;
-    public static List<StudentInfo> mStudentList=new ArrayList<>();
+    private ArrayList<StudentInfo> mStudentList=new ArrayList<>();
     private Button mButton;
     private RecyclerView recyclerView;
     private StudentAdapter studentAdapter;
@@ -54,88 +52,16 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mDialogItems=getResources().getStringArray(R.array.Dialog_Operations);
 
-        recyclerView=(RecyclerView) findViewById(R.id.recycler_view);
-        studentAdapter=new StudentAdapter(mStudentList);
+        //init method will setup Recycler View and Layout Manager
+        init();
 
-        mLayoutManager=new LinearLayoutManager(MainActivity.this);
-        recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(studentAdapter);
+        //button Click Handle will perform action onClick event on Add Student Button
+        buttonClickHandle();
 
-        mButton=(Button) findViewById(R.id.btn_add_student);
-        mButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent=new Intent(MainActivity.this, EditorActivity.class);
-                intent.putExtra("MODE_TYPE","NORMAL");
-                startActivityForResult(intent,1);
-            }
-        });
+        //recycler Click Handler will handle onClick events on recycler View
+        recyclerClickHandler();
 
-        //Responds to the Clicks on Student Info
-        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(MainActivity.this, recyclerView, new RecyclerTouchListener.ClickListener() {
-            @Override
-            public void onClick(View view, final int position) {
-                final StudentInfo mInfo=mStudentList.get(position);
-                //Dialog For Choosing Operation
-                AlertDialog.Builder mAlertBuilder=new AlertDialog.Builder(MainActivity.this);
-                mAlertBuilder.setTitle("Choose Option");
-                mAlertBuilder.setIcon(R.drawable.list);
-                mAlertBuilder.setSingleChoiceItems(mDialogItems, -1, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int modeType) {
-                        Intent intent=new Intent(MainActivity.this,EditorActivity.class);
-                        //Choose item from the list and handle click events
-                        switch (modeType){
-                                //View Mode
-                            case VIEW:
-                                intent.putExtra("MODE_TYPE","VIEW");
-                                startActivity(intent);
-                                dialog.dismiss();
-                                break;
-                                //Update Mode
-                            case UPDATE:
-                                intent.putExtra("MODE_TYPE","UPDATE");
-                                setPosition(position);
-                                startActivityForResult(intent,2);
-                                dialog.dismiss();
-                                break;
-                                //Delete Mode
-                            case DELETE:
-                                AlertDialog.Builder deleteDialog=new AlertDialog.Builder(MainActivity.this);
-                                deleteDialog.setTitle(getString(R.string.delete_title));
-                                deleteDialog.setMessage(getString(R.string.delete_message));
-                                deleteDialog.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        deleteStudentRecord(position);
-                                    }
-                                });
-                                deleteDialog.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.cancel();
-                                    }
-                                });
-                                deleteDialog.show();
-                                dialog.dismiss();
-                                break;
-
-                        }
-                    }
-                });
-                AlertDialog alert=mAlertBuilder.create();
-                alert.show();
-            }
-
-            @Override
-            public void onLongClick(View view, int position) {
-
-            }
-
-        }));
     }
 
     @Override
@@ -200,17 +126,116 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    //Set the element position of current recycler view element
-    /*
+    //Set up Views
+    public void init(){
+        //Setup Dialog Items to String Array
+        mDialogItems=getResources().getStringArray(R.array.Dialog_Operations);
+
+        //Get Reference for recycler and setup Adapter
+        recyclerView=(RecyclerView) findViewById(R.id.recycler_view);
+        studentAdapter=new StudentAdapter(mStudentList);
+
+        //Set layout default layout view for Recycler View
+        mLayoutManager=new LinearLayoutManager(MainActivity.this);
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(studentAdapter);
+    }
+
+    //Handle Button Click Event
+    public void buttonClickHandle(){
+        mButton=(Button) findViewById(R.id.btn_add_student);
+        mButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(MainActivity.this, EditorActivity.class);
+                intent.putExtra("MODE_TYPE","NORMAL");
+                intent.putParcelableArrayListExtra("STUDENT_LIST",mStudentList);
+                startActivityForResult(intent,1);
+            }
+        });
+    }
+
+    //Handle Recycler Click Events
+    public void recyclerClickHandler(){
+        //Responds to the Clicks on Student Info
+        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(MainActivity.this, recyclerView, new RecyclerTouchListener.ClickListener() {
+            @Override
+            public void onClick(View view, final int position) {
+                //Dialog For Choosing Operation
+                final StudentInfo mInfo=mStudentList.get(position);
+                AlertDialog.Builder mAlertBuilder=new AlertDialog.Builder(MainActivity.this);
+                mAlertBuilder.setTitle("Choose Option");
+                mAlertBuilder.setIcon(R.drawable.list);
+                mAlertBuilder.setSingleChoiceItems(mDialogItems, -1, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int modeType) {
+                        Intent intent=new Intent(MainActivity.this,EditorActivity.class);
+                        //Choose item from the list and handle click events
+                        switch (modeType){
+                            //View Mode
+                            case VIEW:
+                                intent.putExtra("MODE_TYPE","VIEW");
+                                intent.putExtra("STUDENT_NAME",mInfo.getName());
+                                intent.putExtra("STUDENT_ID",mInfo.getID());
+                                startActivity(intent);
+                                dialog.dismiss();
+                                break;
+                            //Update Mode
+                            case UPDATE:
+                                intent.putExtra("MODE_TYPE","UPDATE");
+                                intent.putExtra("STUDENT_NAME",mInfo.getName());
+                                intent.putExtra("STUDENT_ID",mInfo.getID());
+                                setPosition(position);
+                                startActivityForResult(intent,2);
+                                dialog.dismiss();
+                                break;
+                            //Delete Mode
+                            case DELETE:
+                                AlertDialog.Builder deleteDialog=new AlertDialog.Builder(MainActivity.this);
+                                deleteDialog.setTitle(getString(R.string.delete_title));
+                                deleteDialog.setMessage(getString(R.string.delete_message));
+                                deleteDialog.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        deleteStudentRecord(position);
+                                    }
+                                });
+                                deleteDialog.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.cancel();
+                                    }
+                                });
+                                deleteDialog.show();
+                                dialog.dismiss();
+                                break;
+
+                        }
+                    }
+                });
+                AlertDialog alert=mAlertBuilder.create();
+                alert.show();
+            }
+
+            @Override
+            public void onLongClick(View view, int position) {
+
+            }
+
+        }));
+    }
+
+    /*Set the element position of current recycler view element
      *@param position as current recycler view element
      */
     private void setPosition(int position){
              mItemPosition=position;
     }
 
-    /*
-    * @return Current position of the recycler view element
-    */
+    /*Return current Position of element
+     *@return Current position of the recycler view element
+     */
     private int getPosition(){
         return mItemPosition;
     }

@@ -1,4 +1,4 @@
-package com.studentmanagement.Validator;
+package com.studentmanagement.validator;
 
 import android.text.Editable;
 import android.text.TextWatcher;

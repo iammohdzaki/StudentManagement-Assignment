@@ -1,4 +1,4 @@
-package com.studentmanagement.Adapter;
+package com.studentmanagement.adapter;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.studentmanagement.R;
-import com.studentmanagement.Model.StudentInfo;
+import com.studentmanagement.model.StudentInfo;
 
 import java.util.List;
 

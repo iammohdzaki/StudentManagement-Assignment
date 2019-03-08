@@ -1,7 +1,9 @@
-package com.studentmanagement.Validator;
+package com.studentmanagement.validator;
 
-import com.studentmanagement.Activity.MainActivity;
-import com.studentmanagement.Model.StudentInfo;
+import com.studentmanagement.model.StudentInfo;
+
+import java.util.ArrayList;
+
 
 
 public class Validator {
@@ -29,7 +31,7 @@ public class Validator {
      *@param mID as Entered Student ID
      *@return true if ID is Unique else return false
      */
-    public final static boolean validateID(String mID){
+    public final static boolean validateId(String mID){
         if(mID.isEmpty()){
             return false;
         }
@@ -40,8 +42,8 @@ public class Validator {
      *@param mID as Entered Student ID
      *@return true if ID is Unique else return false
      */
-    public final static boolean uniqueID(String mID){
-        for(StudentInfo s: MainActivity.mStudentList){
+    public final static boolean uniqueId(String mID, ArrayList<StudentInfo> mStudentList){
+        for(StudentInfo s: mStudentList){
             if(mID.equals(s.getID())){
                 return false;
             }
