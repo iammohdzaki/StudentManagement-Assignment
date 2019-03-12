@@ -21,17 +21,29 @@
     <string name="negative_option">No</string>
     <string name="delete_all_dialog">Are you sure to delete all records?</string>
     <string name="delete_all_positive_text">Delete Anyway</string>
+
+    <!--Edit Text Hint String-->
     <string name="et_hint_name">Name</string>
     <string name="et_hint_roll">Roll Number</string>
     <string name="btn_text">Save</string>
+
+    <!--Menu Item Strings-->
     <string name="menu_delete_all">Delete All</string>
     <string name="menu_filter">Filter</string>
     <string name="menu_sort_name">Sort by Name</string>
     <string name="menu_sort_id">Sort by ID</string>
     <string name="menu_switch">Switch View</string>
+
+
     <string name="activity_title_add">Add Student</string>
     <string name="btn_update">Update</string>
     <string name="activity_title_update">Update Student</string>
+    <string name="main_choose_option">Choose Option</string>
+    <string name="til_hint_name">Name</string>
+    <string name="til_hint_id">Roll Number</string>
+    <string name="toast_data_saved">Data Saved</string>
+    <string name="editor_title_details">Student Details</string>
+    <string name="update_data_editor">Data Updated</string>
 
 
     <string-array name="spinner_list_item_array">

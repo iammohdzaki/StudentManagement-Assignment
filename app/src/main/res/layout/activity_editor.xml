@@ -57,7 +57,7 @@
         android:layout_marginLeft="@dimen/btn_margin_left"
         android:layout_marginTop="@dimen/btn_margin_top"
         android:layout_marginRight="@dimen/btn_margin_right"
-        android:background="@drawable/button_skin"
+        android:background="@drawable/selector_btn_save"
         android:text="@string/btn_text"
         android:textColor="@color/button_text" />
 

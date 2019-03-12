@@ -23,6 +23,7 @@ import com.studentmanagement.adapter.StudentAdapter;
 import com.studentmanagement.comparator.ComparatorID;
 import com.studentmanagement.comparator.ComparatorName;
 import com.studentmanagement.R;
+import com.studentmanagement.constant.Constant;
 import com.studentmanagement.touchListener.RecyclerTouchListener;
 import com.studentmanagement.model.StudentInfo;
 
@@ -31,13 +32,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Collections;
 
+
 public class MainActivity extends AppCompatActivity {
 
-    public final static int VIEW=0;
-    public final static int UPDATE=1;
-    public final static int DELETE=2;
-    public final static int SAVE_RESULT_CODE =1;
-    public final static int UPDATE_RESULT_CODE =2;
+
     private ArrayList<StudentInfo> mStudentList=new ArrayList<>();
     private Button btnAddData;
     private RecyclerView recyclerView;
@@ -69,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         //When Result code is Save Data
-        if(resultCode == SAVE_RESULT_CODE){
+        if(resultCode == Constant.SAVE_RESULT_CODE){
             String name=data.getStringExtra("NAME");
             String id=data.getStringExtra("ID");
             mStudentList.add(new StudentInfo(name,id));
@@ -78,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //When Result code is Update Data
-        if(resultCode== UPDATE_RESULT_CODE){
+        if(resultCode== Constant.UPDATE_RESULT_CODE){
             String name=data.getStringExtra("NAME");
             String id=data.getStringExtra("ID");
             //Get location of current clicked element
@@ -90,7 +88,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    //Show menu on the Screen
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu,menu);
@@ -102,23 +99,19 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    //Handle Click Events on Menu Item
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.action_delete_all_entries:
-                //Show Dialog for Confirmation
                 deleteConfirmationDialog();
                 return true;
             case R.id.menu_switch:
                 return true;
             case R.id.action_sort_name:
-                //Sort Student List by Name i.e A-Z
                 Collections.sort(mStudentList,new ComparatorName());
                 studentAdapter.notifyDataSetChanged();
                 return true;
             case R.id.action_sort_id:
-                //Sort Student List by ID or Roll Number i.e 0-9
                 Collections.sort(mStudentList,new ComparatorID());
                 studentAdapter.notifyDataSetChanged();
                 return true;
@@ -128,14 +121,11 @@ public class MainActivity extends AppCompatActivity {
 
     //Set up Views
     public void init(){
-        //Setup Dialog Items to String Array
         mDialogItems=getResources().getStringArray(R.array.Dialog_Operations);
 
-        //Get Reference for recycler and setup Adapter
-        recyclerView=(RecyclerView) findViewById(R.id.recycler_view);
+        recyclerView=findViewById(R.id.recycler_view);
         studentAdapter=new StudentAdapter(mStudentList);
 
-        //Set layout default layout view for Recycler View
         mLayoutManager=new LinearLayoutManager(MainActivity.this);
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -144,13 +134,13 @@ public class MainActivity extends AppCompatActivity {
 
     //Handle Button Click Event
     public void buttonClickHandle(){
-        btnAddData =(Button) findViewById(R.id.btn_add_student);
+        btnAddData =findViewById(R.id.btn_add_student);
         btnAddData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent=new Intent(MainActivity.this, EditorActivity.class);
-                intent.putExtra("MODE_TYPE","NORMAL");
-                intent.putParcelableArrayListExtra("STUDENT_LIST",mStudentList);
+                intent.putExtra(Constant.MODE_TYPE,Constant.MODE_NORMAL);
+                intent.putParcelableArrayListExtra(Constant.STUDENT_LIST,mStudentList);
                 startActivityForResult(intent,1);
             }
         });
@@ -165,34 +155,32 @@ public class MainActivity extends AppCompatActivity {
                 //Dialog For Choosing Operation
                 final StudentInfo mInfo=mStudentList.get(position);
                 AlertDialog.Builder mAlertBuilder=new AlertDialog.Builder(MainActivity.this);
-                mAlertBuilder.setTitle("Choose Option");
-                mAlertBuilder.setIcon(R.drawable.list);
+                mAlertBuilder.setTitle(getString(R.string.main_choose_option));
+                mAlertBuilder.setIcon(R.drawable.vector_list_view);
                 mAlertBuilder.setSingleChoiceItems(mDialogItems, -1, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int modeType) {
                         Intent intent=new Intent(MainActivity.this,EditorActivity.class);
-                        //Choose item from the list and handle click events
+                        //Choose item from the vector_list_view and handle click events
                         switch (modeType){
                             //View Mode
-                            case VIEW:
-                                intent.putExtra("MODE_TYPE","VIEW");
-                                intent.putExtra("STUDENT_NAME",mInfo.getName());
-                                intent.putExtra("STUDENT_ID",mInfo.getID());
+                            case Constant.VIEW:
+                                intent.putExtra(Constant.MODE_TYPE,Constant.MODE_VIEW);
+                                packData(intent,mInfo);
                                 startActivity(intent);
                                 dialog.dismiss();
                                 break;
                             //Update Mode
-                            case UPDATE:
-                                intent.putExtra("MODE_TYPE","UPDATE");
-                                intent.putExtra("STUDENT_NAME",mInfo.getName());
-                                intent.putExtra("STUDENT_ID",mInfo.getID());
-                                intent.putParcelableArrayListExtra("STUDENT_LIST",mStudentList);
+                            case Constant.UPDATE:
+                                intent.putExtra(Constant.MODE_TYPE,Constant.MODE_UPDATE);
+                                packData(intent,mInfo);
+                                intent.putParcelableArrayListExtra(Constant.STUDENT_LIST,mStudentList);
                                 setPosition(position);
-                                startActivityForResult(intent,2);
+                                startActivityForResult(intent,Constant.UPDATE_RESULT_CODE);
                                 dialog.dismiss();
                                 break;
                             //Delete Mode
-                            case DELETE:
+                            case Constant.DELETE:
                                 AlertDialog.Builder deleteDialog=new AlertDialog.Builder(MainActivity.this);
                                 deleteDialog.setTitle(getString(R.string.delete_title));
                                 deleteDialog.setMessage(getString(R.string.delete_message));
@@ -227,21 +215,36 @@ public class MainActivity extends AppCompatActivity {
         }));
     }
 
-    /*Set the element position of current recycler view element
-     *@param position as current recycler view element
+    /**
+     * Packs the details of Student in Intent
+     * @param intent as Intent Object
+     * @param mInfo as Student Object Reference
+     */
+    private void packData(Intent intent, StudentInfo mInfo) {
+        intent.putExtra(Constant.STUDENT_NAME,mInfo.getName());
+        intent.putExtra(Constant.STUDENT_ID,mInfo.getID());
+    }
+
+    /**
+     * Set the element position of current recycler view element
+     * @param position as current recycler view element
      */
     private void setPosition(int position){
              mItemPosition=position;
     }
 
-    /*Return current Position of element
-     *@return Current position of the recycler view element
+    /**
+     * Return current Position of element
+     * @return Current position of the recycler view element
      */
     private int getPosition(){
         return mItemPosition;
     }
 
-    //Change View from List to Grid and vice versa
+    /**
+     * Change View from List to Grid and vice versa
+     * @param menu as Menu Reference
+     */
     private void handleLayoutView(@NotNull Menu menu) {
         mSwitch=menu.findItem(R.id.menu_switch).getActionView().findViewById(R.id.switch_toggle_view);
         mSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -262,8 +265,7 @@ public class MainActivity extends AppCompatActivity {
 
     //Show dialog before deleting all records
     private void deleteConfirmationDialog() {
-        // Create an AlertDialog.Builder and set the message, and click listeners
-        // for the positive and negative buttons on the dialog.
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(getString(R.string.delete_all_dialog));
         builder.setPositiveButton(getString(R.string.delete_all_positive_text), new DialogInterface.OnClickListener() {
@@ -292,7 +294,7 @@ public class MainActivity extends AppCompatActivity {
 
     //Hide Layout when data is available
     private void hideLayout(){
-        mLayout=(RelativeLayout) findViewById(R.id.empty_view);
+        mLayout=findViewById(R.id.empty_view);
 
         if(studentAdapter.getItemCount()==-1){
             mLayout.setVisibility(RelativeLayout.VISIBLE);
@@ -301,7 +303,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //Delete One Student Record
+    /**
+     * Delete One Student Record
+     * @param position as current position of Student
+     */
     private void deleteStudentRecord(int position){
         mStudentList.remove(mStudentList.get(position));
         studentAdapter.notifyDataSetChanged();

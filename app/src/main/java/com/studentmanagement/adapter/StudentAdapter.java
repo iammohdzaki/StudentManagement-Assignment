@@ -33,8 +33,8 @@ public class StudentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         public StudentViewHolder(View view) {
             super(view);
-            name=(TextView) view.findViewById(R.id.tv_name);
-            id=(TextView) view.findViewById(R.id.tv_roll);
+            name=view.findViewById(R.id.tv_name);
+            id= view.findViewById(R.id.tv_roll);
 
         }
     }

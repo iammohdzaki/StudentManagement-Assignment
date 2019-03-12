@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/rounded_corners_view"
+    android:background="@drawable/selector_recycler_list"
     android:clickable="true"
     android:focusable="true"
     android:orientation="vertical"

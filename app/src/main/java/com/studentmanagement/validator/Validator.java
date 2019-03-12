@@ -1,5 +1,6 @@
 package com.studentmanagement.validator;
 
+import com.studentmanagement.constant.Constant;
 import com.studentmanagement.model.StudentInfo;
 
 import java.util.ArrayList;
@@ -8,28 +9,26 @@ import java.util.ArrayList;
 
 public class Validator {
 
-
-    //RegEx For Name
-    private final static String NAME_REGEX="^[a-zA-Z\\s]+$";
-
-    /*
-     *@param mName as Entered Student Name
-     *@return true if Name is Valid else return false
+    /**
+     * Validate Name
+     * @param mName as Entered Student Name
+     * @return true if Name is Valid else return false
      */
     public final static boolean validateName(String mName){
         if(mName.trim().isEmpty()){
             return false;
         }
 
-        if(!mName.matches(NAME_REGEX)){
+        if(!mName.matches(Constant.NAME_REGEX)){
             return false;
         }
         return true;
     }
 
-    /*
-     *@param mID as Entered Student ID
-     *@return true if ID is Unique else return false
+    /**
+     * Validate Id
+     * @param mID as Entered Student ID
+     * @return true if ID is Unique else return false
      */
     public final static boolean validateId(String mID){
         if(mID.isEmpty()){
@@ -38,9 +37,11 @@ public class Validator {
         return true;
     }
 
-    /*
-     *@param mID as Entered Student ID
-     *@return true if ID is Unique else return false
+    /**
+     * Validate Unique Id
+     * @param mID as Entered Student ID
+     * @param mStudentList as Current Student Details List
+     * @return true if ID is Unique else return false
      */
     public final static boolean uniqueId(String mID, ArrayList<StudentInfo> mStudentList){
         for(StudentInfo s: mStudentList){

@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.studentmanagement.constant.Constant;
 import com.studentmanagement.model.StudentInfo;
 import com.studentmanagement.R;
 import com.studentmanagement.validator.CustomTextWatcher;
@@ -22,7 +23,6 @@ import java.util.ArrayList;
 
 public class EditorActivity extends AppCompatActivity {
 
-    private final static String MODE_TYPE = "MODE_TYPE";
     private Button btnSaveData;
     private EditText etName, etId;
     private TextInputLayout tiName, tiId;
@@ -44,8 +44,8 @@ public class EditorActivity extends AppCompatActivity {
     public void init(){
         tiName = findViewById(R.id.til_name);
         tiId = findViewById(R.id.til_roll);
-        tiName.setHint("Name");
-        tiId.setHint("Roll Number");
+        tiName.setHint(getString(R.string.til_hint_name));
+        tiId.setHint(getString(R.string.til_hint_id));
 
         etName = findViewById(R.id.et_name);
         etId = findViewById(R.id.et_roll_number);
@@ -54,19 +54,19 @@ public class EditorActivity extends AppCompatActivity {
         etName.addTextChangedListener(new CustomTextWatcher(etName));
         etId.addTextChangedListener(new CustomTextWatcher(etId));
 
-        btnSaveData = (Button) findViewById(R.id.btn_save_data);
+        btnSaveData =findViewById(R.id.btn_save_data);
     }
 
     //Choose Mode
     public void chooseMode(){
         final Intent intent = getIntent();
-        final ArrayList<StudentInfo> mStudentList=intent.getParcelableArrayListExtra("STUDENT_LIST");
+        final ArrayList<StudentInfo> mStudentList=intent.getParcelableArrayListExtra(Constant.STUDENT_LIST);
 
-        final String id=intent.getStringExtra("STUDENT_ID");
+        final String id=intent.getStringExtra(Constant.STUDENT_ID);
         setTitle(R.string.activity_title_add);
 
-        switch (intent.getStringExtra(MODE_TYPE)){
-            case "NORMAL":
+        switch (intent.getStringExtra(Constant.MODE_TYPE)){
+            case Constant.MODE_NORMAL:
                 setTitle(R.string.activity_title_add);
                 btnSaveData.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -75,7 +75,7 @@ public class EditorActivity extends AppCompatActivity {
                     }
                 });
                 break;
-            case "UPDATE":
+            case Constant.MODE_UPDATE:
                 btnSaveData.setText(getString(R.string.btn_update));
                 setTitle(R.string.activity_title_update);
                 fillData(etName, etId, intent);
@@ -86,14 +86,17 @@ public class EditorActivity extends AppCompatActivity {
                     }
                 });
                 break;
-            case "VIEW":
+            case Constant.MODE_VIEW:
                 viewMode(etName, etId);
                 fillData(etName, etId, intent);
                 break;
         }
     }
 
-    // When activity is opened in normal mode i.e Saves New Student Data
+    /**
+     * When activity is opened in normal mode i.e Saves New Student Data
+     * @param mStudentList as Current Student List
+     */
     public void saveDataMode(ArrayList<StudentInfo> mStudentList) {
         Intent sendBack = new Intent();
         //Validate Name i.e No special Character and numbers
@@ -119,22 +122,31 @@ public class EditorActivity extends AppCompatActivity {
         tiName.setErrorEnabled(false);
         tiId.setErrorEnabled(false);
 
-        Toast.makeText(EditorActivity.this, "Data Saved", Toast.LENGTH_LONG).show();
-        sendBack.putExtra("ID", etId.getText().toString());
-        sendBack.putExtra("NAME", etName.getText().toString());
-        setResult(1, sendBack);
+        Toast.makeText(EditorActivity.this, getString(R.string.toast_data_saved), Toast.LENGTH_LONG).show();
+        sendBack.putExtra(Constant.UPDATED_ID, etId.getText().toString());
+        sendBack.putExtra(Constant.UPDATED_NAME, etName.getText().toString());
+        setResult(Constant.SAVE_RESULT_CODE, sendBack);
         finish();
     }
 
-    // Populate the Edit Text Field in Case of Edit and View Mode
+    /**
+     * Populate the Edit Text Field in Case of Edit and View Mode
+     * @param mName as Name Edit Text reference
+     * @param mID as Id Edit Text reference
+     * @param intent as Intent Object reference
+     */
     public void fillData(EditText mName, EditText mID, Intent intent) {
-        setTitle("Student Details");
+        setTitle(R.string.editor_title_details);
 
-        mName.setText(intent.getStringExtra("STUDENT_NAME"));
-        mID.setText(intent.getStringExtra("STUDENT_ID"));
+        mName.setText(intent.getStringExtra(Constant.STUDENT_NAME));
+        mID.setText(intent.getStringExtra(Constant.STUDENT_ID));
     }
 
-    // Show Data in View Mode
+    /**
+     * Show Data in View Mode
+     * @param mName as Name Edit Text reference
+     * @param mID as Id Edit Text reference
+     */
     public void viewMode(EditText mName, EditText mID) {
         mName.setEnabled(false);
         mID.setEnabled(false);
@@ -143,17 +155,25 @@ public class EditorActivity extends AppCompatActivity {
         btnSaveData.setVisibility(View.INVISIBLE);
     }
 
-    @NotNull
+    /**
+     * @return Current Edit Text String
+     */
     private String getNameEditText(){
         return etName.getText().toString().trim();
     }
 
-    @NotNull
+    /**
+     * @return Current Edit Text String
+     */
     private String getIdEditText(){
         return etId.getText().toString().trim();
     }
 
-    //When the activity opened in UPDATE or EDIT MODE
+    /**
+     * When the activity opened in UPDATE or EDIT MODE
+     * @param id as Student ID
+     * @param mStudentList as Student Details List
+     */
     public void updateMode(String id,ArrayList<StudentInfo> mStudentList) {
 
         //Validate Name i.e No special Character and numbers
@@ -183,16 +203,19 @@ public class EditorActivity extends AppCompatActivity {
         tiId.setErrorEnabled(false);
 
         Intent sendBack =new Intent();
-        Toast.makeText(EditorActivity.this, "Data Updated", Toast.LENGTH_LONG).show();
+        Toast.makeText(EditorActivity.this, getString(R.string.update_data_editor), Toast.LENGTH_LONG).show();
 
         //Add Updated data to Intent
-        sendBack.putExtra("ID",getIdEditText());
-        sendBack.putExtra("NAME",getNameEditText());
+        sendBack.putExtra(Constant.UPDATED_ID,getIdEditText());
+        sendBack.putExtra(Constant.UPDATED_NAME,getNameEditText());
         setResult(2, sendBack);
         finish();
     }
 
-    //Focus on the view where error occur
+    /**
+     * Focus on the view where error occur
+     * @param view as Current View Reference
+     */
     private void requestFocus(@NotNull View view) {
         if (view.requestFocus()) {
             getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
