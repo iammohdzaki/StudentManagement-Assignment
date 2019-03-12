@@ -22,59 +22,75 @@ import java.util.ArrayList;
 
 public class EditorActivity extends AppCompatActivity {
 
-    private final static String MODETYPE = "MODE_TYPE";
-    private Button mSaveButton;
-    private EditText mNameInfo, mIdInfo;
-    private TextInputLayout nameTextInput, rollTextInput;
+    private final static String MODE_TYPE = "MODE_TYPE";
+    private Button btnSaveData;
+    private EditText etName, etId;
+    private TextInputLayout tiName, tiId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor);
 
-        nameTextInput = findViewById(R.id.til_name);
-        rollTextInput = findViewById(R.id.til_roll);
-        nameTextInput.setHint("Name");
-        rollTextInput.setHint("Roll Number");
+        //Initialize all resources
+        init();
 
-        mNameInfo = findViewById(R.id.et_name);
-        mIdInfo = findViewById(R.id.et_roll_number);
+        //Choose Mode in which activity is to be opened
+        chooseMode();
+
+    }
+
+    //Init method will initialize all Views
+    public void init(){
+        tiName = findViewById(R.id.til_name);
+        tiId = findViewById(R.id.til_roll);
+        tiName.setHint("Name");
+        tiId.setHint("Roll Number");
+
+        etName = findViewById(R.id.et_name);
+        etId = findViewById(R.id.et_roll_number);
 
         //Add TextWatcher to EditText
-        mNameInfo.addTextChangedListener(new CustomTextWatcher(mNameInfo));
-        mIdInfo.addTextChangedListener(new CustomTextWatcher(mIdInfo));
+        etName.addTextChangedListener(new CustomTextWatcher(etName));
+        etId.addTextChangedListener(new CustomTextWatcher(etId));
 
-        mSaveButton = (Button) findViewById(R.id.btn_save_data);
+        btnSaveData = (Button) findViewById(R.id.btn_save_data);
+    }
 
+    //Choose Mode
+    public void chooseMode(){
         final Intent intent = getIntent();
         final ArrayList<StudentInfo> mStudentList=intent.getParcelableArrayListExtra("STUDENT_LIST");
 
         final String id=intent.getStringExtra("STUDENT_ID");
         setTitle(R.string.activity_title_add);
 
-        if (intent.getStringExtra(MODETYPE).equals("NORMAL")) {
-            setTitle(R.string.activity_title_add);
-            mSaveButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    saveDataMode(mStudentList);
-                }
-            });
-        } else if (intent.getStringExtra(MODETYPE).equals("UPDATE")) {
-            mSaveButton.setText(getString(R.string.btn_update));
-            setTitle(R.string.activity_title_update);
-            fillData(mNameInfo, mIdInfo, intent);
-            mSaveButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    updateMode(id,mStudentList);
-                }
-            });
-        } else if (intent.getStringExtra(MODETYPE).equals("VIEW")) {
-            viewMode(mNameInfo, mIdInfo);
-            fillData(mNameInfo, mIdInfo, intent);
+        switch (intent.getStringExtra(MODE_TYPE)){
+            case "NORMAL":
+                setTitle(R.string.activity_title_add);
+                btnSaveData.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        saveDataMode(mStudentList);
+                    }
+                });
+                break;
+            case "UPDATE":
+                btnSaveData.setText(getString(R.string.btn_update));
+                setTitle(R.string.activity_title_update);
+                fillData(etName, etId, intent);
+                btnSaveData.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        updateMode(id,mStudentList);
+                    }
+                });
+                break;
+            case "VIEW":
+                viewMode(etName, etId);
+                fillData(etName, etId, intent);
+                break;
         }
-
     }
 
     // When activity is opened in normal mode i.e Saves New Student Data
@@ -82,30 +98,30 @@ public class EditorActivity extends AppCompatActivity {
         Intent sendBack = new Intent();
         //Validate Name i.e No special Character and numbers
         if (!Validator.validateName(getNameEditText())) {
-            nameTextInput.setError(getString(R.string.err_msg_name));
-            requestFocus(nameTextInput);
+            tiName.setError(getString(R.string.err_msg_name));
+            requestFocus(tiName);
             return;
         }
         //Validate ID or Roll Number
         if (!Validator.validateId(getIdEditText())) {
-            rollTextInput.setError(getString(R.string.err_msg_id));
-            requestFocus(mIdInfo);
+            tiId.setError(getString(R.string.err_msg_id));
+            requestFocus(etId);
             return;
         }
 
         //Validate Unique ID
         if (!Validator.uniqueId(getIdEditText(),mStudentList)) {
-            rollTextInput.setError(getString(R.string.unique_id_err));
-            requestFocus(mIdInfo);
+            tiId.setError(getString(R.string.unique_id_err));
+            requestFocus(etId);
             return;
         }
 
-        nameTextInput.setErrorEnabled(false);
-        rollTextInput.setErrorEnabled(false);
+        tiName.setErrorEnabled(false);
+        tiId.setErrorEnabled(false);
 
         Toast.makeText(EditorActivity.this, "Data Saved", Toast.LENGTH_LONG).show();
-        sendBack.putExtra("ID", mIdInfo.getText().toString());
-        sendBack.putExtra("NAME", mNameInfo.getText().toString());
+        sendBack.putExtra("ID", etId.getText().toString());
+        sendBack.putExtra("NAME", etName.getText().toString());
         setResult(1, sendBack);
         finish();
     }
@@ -124,48 +140,47 @@ public class EditorActivity extends AppCompatActivity {
         mID.setEnabled(false);
         mID.setFocusable(false);
         mName.setFocusable(false);
-        mSaveButton.setVisibility(View.INVISIBLE);
+        btnSaveData.setVisibility(View.INVISIBLE);
     }
-
 
     @NotNull
     private String getNameEditText(){
-        return mNameInfo.getText().toString().trim();
+        return etName.getText().toString().trim();
     }
 
     @NotNull
     private String getIdEditText(){
-        return mIdInfo.getText().toString().trim();
+        return etId.getText().toString().trim();
     }
+
     //When the activity opened in UPDATE or EDIT MODE
     public void updateMode(String id,ArrayList<StudentInfo> mStudentList) {
 
         //Validate Name i.e No special Character and numbers
         if (!Validator.validateName(getNameEditText())) {
-            nameTextInput.setError(getString(R.string.err_msg_name));
-            requestFocus(nameTextInput);
+            tiName.setError(getString(R.string.err_msg_name));
+            requestFocus(tiName);
             return;
         }
         //Validate ID or Roll Number
         if (!Validator.validateId(getIdEditText())) {
-            rollTextInput.setError(getString(R.string.err_msg_id));
-            requestFocus(mIdInfo);
+            tiId.setError(getString(R.string.err_msg_id));
+            requestFocus(etId);
             return;
         }
 
-        /*
-        if (id.equals(mIdInfo.getText().toString())) {
+        if (id.equals(etId.getText().toString())) {
 
         } else {
             if (!Validator.uniqueId(getIdEditText(),mStudentList)) {
-                rollTextInput.setError(getString(R.string.unique_id_err));
-                requestFocus(mIdInfo);
+                tiId.setError(getString(R.string.unique_id_err));
+                requestFocus(etId);
                 return;
             }
-        }*/
+        }
 
-        nameTextInput.setErrorEnabled(false);
-        rollTextInput.setErrorEnabled(false);
+        tiName.setErrorEnabled(false);
+        tiId.setErrorEnabled(false);
 
         Intent sendBack =new Intent();
         Toast.makeText(EditorActivity.this, "Data Updated", Toast.LENGTH_LONG).show();

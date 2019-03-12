@@ -36,10 +36,10 @@ public class MainActivity extends AppCompatActivity {
     public final static int VIEW=0;
     public final static int UPDATE=1;
     public final static int DELETE=2;
-    public final static int SAVERESULTCODE=1;
-    public final static int UPDATERESULTCODE=2;
+    public final static int SAVE_RESULT_CODE =1;
+    public final static int UPDATE_RESULT_CODE =2;
     private ArrayList<StudentInfo> mStudentList=new ArrayList<>();
-    private Button mButton;
+    private Button btnAddData;
     private RecyclerView recyclerView;
     private StudentAdapter studentAdapter;
     private RelativeLayout mLayout;
@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         //When Result code is Save Data
-        if(resultCode == SAVERESULTCODE){
+        if(resultCode == SAVE_RESULT_CODE){
             String name=data.getStringExtra("NAME");
             String id=data.getStringExtra("ID");
             mStudentList.add(new StudentInfo(name,id));
@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //When Result code is Update Data
-        if(resultCode== UPDATERESULTCODE){
+        if(resultCode== UPDATE_RESULT_CODE){
             String name=data.getStringExtra("NAME");
             String id=data.getStringExtra("ID");
             //Get location of current clicked element
@@ -144,8 +144,8 @@ public class MainActivity extends AppCompatActivity {
 
     //Handle Button Click Event
     public void buttonClickHandle(){
-        mButton=(Button) findViewById(R.id.btn_add_student);
-        mButton.setOnClickListener(new View.OnClickListener() {
+        btnAddData =(Button) findViewById(R.id.btn_add_student);
+        btnAddData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent=new Intent(MainActivity.this, EditorActivity.class);
@@ -186,6 +186,7 @@ public class MainActivity extends AppCompatActivity {
                                 intent.putExtra("MODE_TYPE","UPDATE");
                                 intent.putExtra("STUDENT_NAME",mInfo.getName());
                                 intent.putExtra("STUDENT_ID",mInfo.getID());
+                                intent.putParcelableArrayListExtra("STUDENT_LIST",mStudentList);
                                 setPosition(position);
                                 startActivityForResult(intent,2);
                                 dialog.dismiss();
