@@ -7,20 +7,11 @@ public class StudentInfo implements Parcelable {
 
     private String mName,mID;
 
-    /**
-     * Constructor for storing Student Data
-     * @param mName as Student Name
-     * @param mID as Student Id
-     */
     public StudentInfo(String mName,String mID){
         this.mID=mID;
         this.mName=mName;
     }
 
-    /**
-     * Constructor for Packaging data
-     * @param in as Details for Packaging
-     */
     protected StudentInfo(Parcel in) {
         mName = in.readString();
         mID = in.readString();
@@ -38,32 +29,18 @@ public class StudentInfo implements Parcelable {
         }
     };
 
-    /**
-     * @return Student's Name
-     */
     public String getName(){
         return mName;
     }
 
-    /**
-     * @return Student's Id
-     */
     public String getID(){
         return mID;
     }
 
-    /**
-     * Set Student Name
-     * @param mName as Student Name
-     */
     public void setName(String mName){
         this.mName=mName;
     }
 
-    /**
-     * Set Student Id
-     * @param mID as Student Id
-     */
     public void setID(String mID){
         this.mID=mID;
     }

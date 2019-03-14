@@ -41,7 +41,7 @@ public class EditorActivity extends AppCompatActivity {
     }
 
     //Init method will initialize all Views
-    public void init(){
+    private void init(){
         tiName = findViewById(R.id.til_name);
         tiId = findViewById(R.id.til_roll);
         tiName.setHint(getString(R.string.til_hint_name));
@@ -58,7 +58,7 @@ public class EditorActivity extends AppCompatActivity {
     }
 
     //Choose Mode
-    public void chooseMode(){
+    private void chooseMode(){
         final Intent intent = getIntent();
         final ArrayList<StudentInfo> mStudentList=intent.getParcelableArrayListExtra(Constant.STUDENT_LIST);
 
@@ -90,6 +90,8 @@ public class EditorActivity extends AppCompatActivity {
                 viewMode(etName, etId);
                 fillData(etName, etId, intent);
                 break;
+            default:
+                break;
         }
     }
 
@@ -97,7 +99,7 @@ public class EditorActivity extends AppCompatActivity {
      * When activity is opened in normal mode i.e Saves New Student Data
      * @param mStudentList as Current Student List
      */
-    public void saveDataMode(ArrayList<StudentInfo> mStudentList) {
+    private void saveDataMode(ArrayList<StudentInfo> mStudentList) {
         Intent sendBack = new Intent();
         //Validate Name i.e No special Character and numbers
         if (!Validator.validateName(getNameEditText())) {
@@ -190,7 +192,6 @@ public class EditorActivity extends AppCompatActivity {
         }
 
         if (id.equals(etId.getText().toString())) {
-
         } else {
             if (!Validator.uniqueId(getIdEditText(),mStudentList)) {
                 tiId.setError(getString(R.string.unique_id_err));

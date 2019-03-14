@@ -40,11 +40,12 @@ public class MainActivity extends AppCompatActivity {
     private Button btnAddData;
     private RecyclerView recyclerView;
     private StudentAdapter studentAdapter;
-    private RelativeLayout mLayout;
+    private RelativeLayout rlEmptyView;
     private String[] mDialogItems;
     private Switch mSwitch;
     private RecyclerView.LayoutManager mLayoutManager;
     private int mItemPosition;
+    private Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,21 +139,19 @@ public class MainActivity extends AppCompatActivity {
         btnAddData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent(MainActivity.this, EditorActivity.class);
+                intent=createIntent(EditorActivity.class);
                 intent.putExtra(Constant.MODE_TYPE,Constant.MODE_NORMAL);
                 intent.putParcelableArrayListExtra(Constant.STUDENT_LIST,mStudentList);
-                startActivityForResult(intent,1);
+                startActivityForResult(intent,Constant.SAVE_RESULT_CODE);
             }
         });
     }
 
     //Handle Recycler Click Events
     public void recyclerClickHandler(){
-        //Responds to the Clicks on Student Info
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(MainActivity.this, recyclerView, new RecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(View view, final int position) {
-                //Dialog For Choosing Operation
                 final StudentInfo mInfo=mStudentList.get(position);
                 AlertDialog.Builder mAlertBuilder=new AlertDialog.Builder(MainActivity.this);
                 mAlertBuilder.setTitle(getString(R.string.main_choose_option));
@@ -160,8 +159,7 @@ public class MainActivity extends AppCompatActivity {
                 mAlertBuilder.setSingleChoiceItems(mDialogItems, -1, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int modeType) {
-                        Intent intent=new Intent(MainActivity.this,EditorActivity.class);
-                        //Choose item from the vector_list_view and handle click events
+                        intent=createIntent(EditorActivity.class);
                         switch (modeType){
                             //View Mode
                             case Constant.VIEW:
@@ -181,25 +179,11 @@ public class MainActivity extends AppCompatActivity {
                                 break;
                             //Delete Mode
                             case Constant.DELETE:
-                                AlertDialog.Builder deleteDialog=new AlertDialog.Builder(MainActivity.this);
-                                deleteDialog.setTitle(getString(R.string.delete_title));
-                                deleteDialog.setMessage(getString(R.string.delete_message));
-                                deleteDialog.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        deleteStudentRecord(position);
-                                    }
-                                });
-                                deleteDialog.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.cancel();
-                                    }
-                                });
-                                deleteDialog.show();
+                                createDeleteAlertDialog(position);
                                 dialog.dismiss();
                                 break;
-
+                            default:
+                                break;
                         }
                     }
                 });
@@ -213,6 +197,29 @@ public class MainActivity extends AppCompatActivity {
             }
 
         }));
+    }
+
+    /**
+     * Create Delete Dialog
+     * @param position as View Position
+     */
+    private void createDeleteAlertDialog(final int position){
+        AlertDialog.Builder deleteDialog=new AlertDialog.Builder(MainActivity.this);
+        deleteDialog.setTitle(getString(R.string.delete_title));
+        deleteDialog.setMessage(getString(R.string.delete_message));
+        deleteDialog.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                deleteStudentRecord(position);
+            }
+        });
+        deleteDialog.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        deleteDialog.show();
     }
 
     /**
@@ -294,12 +301,12 @@ public class MainActivity extends AppCompatActivity {
 
     //Hide Layout when data is available
     private void hideLayout(){
-        mLayout=findViewById(R.id.empty_view);
+        rlEmptyView =findViewById(R.id.empty_view);
 
         if(studentAdapter.getItemCount()==-1){
-            mLayout.setVisibility(RelativeLayout.VISIBLE);
+            rlEmptyView.setVisibility(RelativeLayout.VISIBLE);
         }else{
-            mLayout.setVisibility(RelativeLayout.INVISIBLE);
+            rlEmptyView.setVisibility(RelativeLayout.INVISIBLE);
         }
     }
 
@@ -311,7 +318,7 @@ public class MainActivity extends AppCompatActivity {
         mStudentList.remove(mStudentList.get(position));
         studentAdapter.notifyDataSetChanged();
         if(mStudentList.size()==0){
-            mLayout.setVisibility(RelativeLayout.VISIBLE);
+            rlEmptyView.setVisibility(RelativeLayout.VISIBLE);
         }
     }
 
@@ -319,7 +326,16 @@ public class MainActivity extends AppCompatActivity {
     private void deleteAllStudentRecord(){
         mStudentList.removeAll(mStudentList);
         studentAdapter.notifyDataSetChanged();
-        mLayout.setVisibility(RelativeLayout.VISIBLE);
+        rlEmptyView.setVisibility(RelativeLayout.VISIBLE);
     }
 
+    /**
+     * Creates Intent for a Class
+     * @param editorActivityClass as the class name
+     * @return intent
+     */
+    public Intent createIntent(Class<?> editorActivityClass){
+        Intent intent=new Intent(this,editorActivityClass);
+        return intent;
+    }
 }
