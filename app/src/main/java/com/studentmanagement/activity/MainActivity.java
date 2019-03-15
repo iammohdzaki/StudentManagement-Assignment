@@ -3,13 +3,16 @@ package com.studentmanagement.activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,18 +22,22 @@ import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import com.studentmanagement.BackgroundTask.BackgroundTaskAsync;
+import com.studentmanagement.R;
 import com.studentmanagement.adapter.StudentAdapter;
 import com.studentmanagement.comparator.ComparatorID;
 import com.studentmanagement.comparator.ComparatorName;
-import com.studentmanagement.R;
 import com.studentmanagement.constant.Constant;
-import com.studentmanagement.touchListener.RecyclerTouchListener;
+import com.studentmanagement.database.DBHelper;
+import com.studentmanagement.database.StudentContract;
 import com.studentmanagement.model.StudentInfo;
+import com.studentmanagement.touchListener.RecyclerTouchListener;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
+
 
 
 public class MainActivity extends AppCompatActivity {
@@ -46,11 +53,14 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager mLayoutManager;
     private int mItemPosition;
     private Intent intent;
+    private DBHelper mDBhelper;
+    private BackgroundTaskAsync taskAsync;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         //init method will setup Recycler View and Layout Manager
         init();
@@ -61,6 +71,11 @@ public class MainActivity extends AppCompatActivity {
         //recycler Click Handler will handle onClick events on recycler View
         recyclerClickHandler();
 
+        mDBhelper = new DBHelper(this);
+
+
+        showStudentData();
+        hideLayout();
     }
 
     @Override
@@ -68,22 +83,9 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         //When Result code is Save Data
-        if(resultCode == Constant.SAVE_RESULT_CODE){
-            String name=data.getStringExtra("NAME");
-            String id=data.getStringExtra("ID");
-            mStudentList.add(new StudentInfo(name,id));
+        if (resultCode == Constant.SAVE_RESULT_CODE || resultCode == Constant.UPDATE_RESULT_CODE) {
+            showStudentData();
             hideLayout();
-            studentAdapter.notifyDataSetChanged();
-        }
-
-        //When Result code is Update Data
-        if(resultCode== Constant.UPDATE_RESULT_CODE){
-            String name=data.getStringExtra("NAME");
-            String id=data.getStringExtra("ID");
-            //Get location of current clicked element
-            StudentInfo info=mStudentList.get(getPosition());
-            info.setID(id);
-            info.setName(name);
             studentAdapter.notifyDataSetChanged();
         }
 
@@ -126,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
 
         recyclerView=findViewById(R.id.recycler_view);
         studentAdapter=new StudentAdapter(mStudentList);
-
+        rlEmptyView = findViewById(R.id.empty_view);
         mLayoutManager=new LinearLayoutManager(MainActivity.this);
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -301,9 +303,7 @@ public class MainActivity extends AppCompatActivity {
 
     //Hide Layout when data is available
     private void hideLayout(){
-        rlEmptyView =findViewById(R.id.empty_view);
-
-        if(studentAdapter.getItemCount()==-1){
+        if (mStudentList.size() == 0) {
             rlEmptyView.setVisibility(RelativeLayout.VISIBLE);
         }else{
             rlEmptyView.setVisibility(RelativeLayout.INVISIBLE);
@@ -315,6 +315,8 @@ public class MainActivity extends AppCompatActivity {
      * @param position as current position of Student
      */
     private void deleteStudentRecord(int position){
+        taskAsync = new BackgroundTaskAsync(MainActivity.this);
+        taskAsync.execute(Constant.MODE_DELETE, mStudentList.get(position).getID());
         mStudentList.remove(mStudentList.get(position));
         studentAdapter.notifyDataSetChanged();
         if(mStudentList.size()==0){
@@ -324,6 +326,8 @@ public class MainActivity extends AppCompatActivity {
 
     //Delete All Student Record
     private void deleteAllStudentRecord(){
+        taskAsync = new BackgroundTaskAsync(MainActivity.this);
+        taskAsync.execute(Constant.MODE_DELETE_ALL);
         mStudentList.removeAll(mStudentList);
         studentAdapter.notifyDataSetChanged();
         rlEmptyView.setVisibility(RelativeLayout.VISIBLE);
@@ -337,5 +341,29 @@ public class MainActivity extends AppCompatActivity {
     public Intent createIntent(Class<?> editorActivityClass){
         Intent intent=new Intent(this,editorActivityClass);
         return intent;
+    }
+
+
+    private void showStudentData() {
+        SQLiteDatabase db = mDBhelper.getReadableDatabase();
+        Cursor cursor = mDBhelper.getStudentData(db);
+        try {
+            Log.i("ROWS", "Rows Count:" + cursor.getCount());
+            int idColumnIndex = cursor.getColumnIndex(StudentContract.StudentEntry.COLUMN_ID);
+            int nameColumnIndex = cursor.getColumnIndex(StudentContract.StudentEntry.COLUMN_NAME);
+
+            mStudentList.removeAll(mStudentList);
+            while (cursor.moveToNext()) {
+                String currentID = cursor.getString(idColumnIndex);
+                String currentName = cursor.getString(nameColumnIndex);
+                mStudentList.add(new StudentInfo(currentName, currentID));
+            }
+        } finally {
+            // Always close the cursor when you're done reading from it. This releases all its
+            // resources and makes it invalid.
+            cursor.close();
+            db.close();
+        }
+
     }
 }

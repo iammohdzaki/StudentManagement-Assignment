@@ -1,18 +1,23 @@
 package com.studentmanagement.activity;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.studentmanagement.constant.Constant;
-import com.studentmanagement.model.StudentInfo;
+import com.studentmanagement.BackgroundTask.BackgroundTaskAsync;
 import com.studentmanagement.R;
+import com.studentmanagement.constant.Constant;
+import com.studentmanagement.database.DBHelper;
+import com.studentmanagement.model.StudentInfo;
 import com.studentmanagement.validator.CustomTextWatcher;
 import com.studentmanagement.validator.Validator;
 
@@ -20,12 +25,15 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
+import static com.studentmanagement.database.StudentContract.StudentEntry;
+
 
 public class EditorActivity extends AppCompatActivity {
 
     private Button btnSaveData;
     private EditText etName, etId;
     private TextInputLayout tiName, tiId;
+    private BackgroundTaskAsync taskAsync;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +42,7 @@ public class EditorActivity extends AppCompatActivity {
 
         //Initialize all resources
         init();
+
 
         //Choose Mode in which activity is to be opened
         chooseMode();
@@ -54,7 +63,15 @@ public class EditorActivity extends AppCompatActivity {
         etName.addTextChangedListener(new CustomTextWatcher(etName));
         etId.addTextChangedListener(new CustomTextWatcher(etId));
 
+        taskAsync = new BackgroundTaskAsync(EditorActivity.this);
         btnSaveData =findViewById(R.id.btn_save_data);
+        btnSaveData.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                insertData();
+                finish();
+            }
+        });
     }
 
     //Choose Mode
@@ -95,6 +112,26 @@ public class EditorActivity extends AppCompatActivity {
         }
     }
 
+    //Insert Data to DB
+    private void insertData() {
+
+        DBHelper mHelper = new DBHelper(this);
+        SQLiteDatabase db = mHelper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(StudentEntry.COLUMN_NAME, getNameEditText());
+        values.put(StudentEntry.COLUMN_ID, getIdEditText());
+
+        long newRowId = db.insert(StudentEntry.TABLE_NAME, null, values);
+
+        if (newRowId == -1) {
+            Toast.makeText(EditorActivity.this, "Error Adding Data!", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(EditorActivity.this, "New Row Added ID:" + newRowId, Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
     /**
      * When activity is opened in normal mode i.e Saves New Student Data
      * @param mStudentList as Current Student List
@@ -125,8 +162,8 @@ public class EditorActivity extends AppCompatActivity {
         tiId.setErrorEnabled(false);
 
         Toast.makeText(EditorActivity.this, getString(R.string.toast_data_saved), Toast.LENGTH_LONG).show();
-        sendBack.putExtra(Constant.UPDATED_ID, etId.getText().toString());
-        sendBack.putExtra(Constant.UPDATED_NAME, etName.getText().toString());
+        //Background Tasks
+        taskAsync.execute(Constant.MODE_NORMAL, getIdEditText(), getNameEditText());
         setResult(Constant.SAVE_RESULT_CODE, sendBack);
         finish();
     }
@@ -139,7 +176,7 @@ public class EditorActivity extends AppCompatActivity {
      */
     public void fillData(EditText mName, EditText mID, Intent intent) {
         setTitle(R.string.editor_title_details);
-
+        Log.i("Pos", "ID:" + intent.getStringExtra(Constant.STUDENT_ID));
         mName.setText(intent.getStringExtra(Constant.STUDENT_NAME));
         mID.setText(intent.getStringExtra(Constant.STUDENT_ID));
     }
@@ -207,8 +244,7 @@ public class EditorActivity extends AppCompatActivity {
         Toast.makeText(EditorActivity.this, getString(R.string.update_data_editor), Toast.LENGTH_LONG).show();
 
         //Add Updated data to Intent
-        sendBack.putExtra(Constant.UPDATED_ID,getIdEditText());
-        sendBack.putExtra(Constant.UPDATED_NAME,getNameEditText());
+        taskAsync.execute(Constant.MODE_UPDATE, getIdEditText(), getNameEditText(), getIntent().getStringExtra(Constant.STUDENT_ID));
         setResult(2, sendBack);
         finish();
     }

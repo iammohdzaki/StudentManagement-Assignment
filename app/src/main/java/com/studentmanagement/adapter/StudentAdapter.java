@@ -10,13 +10,13 @@ import android.widget.TextView;
 import com.studentmanagement.R;
 import com.studentmanagement.model.StudentInfo;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class StudentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    List<StudentInfo> studentInfoList;
+    ArrayList<StudentInfo> studentInfoList;
 
-    public StudentAdapter(List<StudentInfo> studentInfoList){
+    public StudentAdapter(ArrayList<StudentInfo> studentInfoList) {
         this.studentInfoList=studentInfoList;
     }
     @NonNull
