@@ -12,8 +12,14 @@
         <item>Edit</item>
         <item>Delete</item>
     </string-array>
-    
-    
+
+    <!--Background Task Array-->
+    <string-array name="Background_Task">
+        <item>ASYNC</item>
+        <item>SERVICE</item>
+        <item>INTENT SERVICE</item>
+    </string-array>
+
     <!--Delete Dialog Strings-->
     <string name="delete_message">Are you sure to delete this entry?</string>
     <string name="delete_title">Delete Entry</string>
@@ -44,6 +50,10 @@
     <string name="toast_data_saved">Data Saved</string>
     <string name="editor_title_details">Student Details</string>
     <string name="update_data_editor">Data Updated</string>
+    <string name="data_save_async">Data Saved Using Async</string>
+    <string name="data_update_async">Data Updated Using Async</string>
+    <string name="data_save_intent_service">Service Started for Saving Data</string>
+    <string name="data_update_intent_service">Data Updated Using Service</string>
 
 
     <string-array name="spinner_list_item_array">

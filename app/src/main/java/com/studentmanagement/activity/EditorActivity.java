@@ -1,8 +1,8 @@
 package com.studentmanagement.activity;
 
-import android.content.ContentValues;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -14,9 +14,10 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.studentmanagement.BackgroundTask.BackgroundTaskAsync;
+import com.studentmanagement.BackgroundTask.BackgroundTaskService;
+import com.studentmanagement.BackgroundTask.IntentServiceBackground;
 import com.studentmanagement.R;
 import com.studentmanagement.constant.Constant;
-import com.studentmanagement.database.DBHelper;
 import com.studentmanagement.model.StudentInfo;
 import com.studentmanagement.validator.CustomTextWatcher;
 import com.studentmanagement.validator.Validator;
@@ -25,7 +26,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
-import static com.studentmanagement.database.StudentContract.StudentEntry;
 
 
 public class EditorActivity extends AppCompatActivity {
@@ -34,6 +34,7 @@ public class EditorActivity extends AppCompatActivity {
     private EditText etName, etId;
     private TextInputLayout tiName, tiId;
     private BackgroundTaskAsync taskAsync;
+    private String[] mBackgroundItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +57,8 @@ public class EditorActivity extends AppCompatActivity {
         tiName.setHint(getString(R.string.til_hint_name));
         tiId.setHint(getString(R.string.til_hint_id));
 
+        mBackgroundItems = getResources().getStringArray(R.array.Background_Task);
+
         etName = findViewById(R.id.et_name);
         etId = findViewById(R.id.et_roll_number);
 
@@ -65,13 +68,6 @@ public class EditorActivity extends AppCompatActivity {
 
         taskAsync = new BackgroundTaskAsync(EditorActivity.this);
         btnSaveData =findViewById(R.id.btn_save_data);
-        btnSaveData.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                insertData();
-                finish();
-            }
-        });
     }
 
     //Choose Mode
@@ -112,26 +108,6 @@ public class EditorActivity extends AppCompatActivity {
         }
     }
 
-    //Insert Data to DB
-    private void insertData() {
-
-        DBHelper mHelper = new DBHelper(this);
-        SQLiteDatabase db = mHelper.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(StudentEntry.COLUMN_NAME, getNameEditText());
-        values.put(StudentEntry.COLUMN_ID, getIdEditText());
-
-        long newRowId = db.insert(StudentEntry.TABLE_NAME, null, values);
-
-        if (newRowId == -1) {
-            Toast.makeText(EditorActivity.this, "Error Adding Data!", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(EditorActivity.this, "New Row Added ID:" + newRowId, Toast.LENGTH_SHORT).show();
-        }
-
-    }
-
     /**
      * When activity is opened in normal mode i.e Saves New Student Data
      * @param mStudentList as Current Student List
@@ -161,11 +137,8 @@ public class EditorActivity extends AppCompatActivity {
         tiName.setErrorEnabled(false);
         tiId.setErrorEnabled(false);
 
-        Toast.makeText(EditorActivity.this, getString(R.string.toast_data_saved), Toast.LENGTH_LONG).show();
-        //Background Tasks
-        taskAsync.execute(Constant.MODE_NORMAL, getIdEditText(), getNameEditText());
         setResult(Constant.SAVE_RESULT_CODE, sendBack);
-        finish();
+        BackgroundTaskAlertDialog(Constant.MODE_NORMAL);
     }
 
     /**
@@ -241,12 +214,9 @@ public class EditorActivity extends AppCompatActivity {
         tiId.setErrorEnabled(false);
 
         Intent sendBack =new Intent();
-        Toast.makeText(EditorActivity.this, getString(R.string.update_data_editor), Toast.LENGTH_LONG).show();
-
         //Add Updated data to Intent
-        taskAsync.execute(Constant.MODE_UPDATE, getIdEditText(), getNameEditText(), getIntent().getStringExtra(Constant.STUDENT_ID));
         setResult(2, sendBack);
-        finish();
+        BackgroundTaskAlertDialog(Constant.MODE_UPDATE);
     }
 
     /**
@@ -259,4 +229,58 @@ public class EditorActivity extends AppCompatActivity {
         }
     }
 
+
+    private void BackgroundTaskAlertDialog(final String check) {
+        android.app.AlertDialog.Builder mAlertBuilder = new android.app.AlertDialog.Builder(EditorActivity.this);
+        mAlertBuilder.setTitle(getString(R.string.main_choose_option));
+        mAlertBuilder.setIcon(R.drawable.vector_list_view);
+        mAlertBuilder.setSingleChoiceItems(mBackgroundItems, -1, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int modeType) {
+                switch (modeType) {
+                    case Constant.ASYNC:
+                        if (check.equals(Constant.MODE_NORMAL)) {
+                            Toast.makeText(EditorActivity.this, getString(R.string.data_save_async), Toast.LENGTH_LONG).show();
+                            taskAsync.execute(Constant.MODE_NORMAL, getIdEditText(), getNameEditText());
+                            finish();
+                        } else if (check.equals(Constant.MODE_UPDATE)) {
+                            Toast.makeText(EditorActivity.this, getString(R.string.data_update_async), Toast.LENGTH_LONG).show();
+                            taskAsync.execute(Constant.MODE_UPDATE, getIdEditText(), getNameEditText(), getIntent().getStringExtra(Constant.STUDENT_ID));
+                            finish();
+                        }
+                        dialog.dismiss();
+                        break;
+                    case Constant.SERVICE:
+                        Intent service = new Intent(EditorActivity.this, BackgroundTaskService.class);
+                        Toast.makeText(EditorActivity.this, "Service Started..", Toast.LENGTH_LONG).show();
+                        String current = getIntent().getStringExtra(Constant.STUDENT_ID);
+                        service.putExtra(Constant.MODE_TYPE, Constant.MODE_NORMAL);
+                        service.putExtra(Constant.STUDENT_NAME, getNameEditText());
+                        service.putExtra(Constant.STUDENT_ID, getIdEditText());
+                        service.putExtra(Constant.CURRENT_ID, current);
+                        startService(service);
+                        finish();
+                        dialog.dismiss();
+                        break;
+                    case Constant.INTENT_SERVICE:
+                        Intent intent = new Intent(EditorActivity.this, IntentServiceBackground.class);
+                        Toast.makeText(EditorActivity.this, "Intent Service Started..", Toast.LENGTH_LONG).show();
+                        String position = getIntent().getStringExtra(Constant.STUDENT_ID);
+                        Toast.makeText(EditorActivity.this, getString(R.string.data_save_intent_service), Toast.LENGTH_LONG).show();
+                        intent.putExtra(Constant.MODE_TYPE, Constant.MODE_NORMAL);
+                        intent.putExtra(Constant.STUDENT_NAME, getNameEditText());
+                        intent.putExtra(Constant.STUDENT_ID, getIdEditText());
+                        intent.putExtra(Constant.CURRENT_ID, position);
+                        startService(intent);
+                        finish();
+                        dialog.dismiss();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
+        AlertDialog alert = mAlertBuilder.create();
+        alert.show();
+    }
 }

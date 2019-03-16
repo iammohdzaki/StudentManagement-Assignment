@@ -1,7 +1,6 @@
 package com.studentmanagement.BackgroundTask;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -50,10 +49,14 @@ public class BackgroundTaskAsync extends AsyncTask<String,Void,String> {
                 Log.i("STRING","Row ID->"+strings[1]);
                 dbHelper.deleteStudentData(db,position);
                 db.close();
+                break;
             case Constant.MODE_DELETE_ALL:
                 db=dbHelper.getWritableDatabase();
                 dbHelper.deleteAllStudentData(db);
                 db.close();
+                break;
+            default:
+                break;
 
         }
         return null;

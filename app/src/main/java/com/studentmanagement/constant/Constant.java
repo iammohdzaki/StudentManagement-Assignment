@@ -13,6 +13,10 @@ public class Constant {
     public static final String STUDENT_NAME="STUDENT_NAME";
     public static final String STUDENT_ID="STUDENT_ID";
     public static final String NAME_REGEX="^[a-zA-Z\\s]+$";
+    public static final String CURRENT_ID = "CURRENT_ID";
+    public static final int ASYNC = 0;
+    public static final int SERVICE = 1;
+    public static final int INTENT_SERVICE = 2;
     public static final int VIEW=0;
     public static final int UPDATE=1;
     public static final int DELETE=2;
