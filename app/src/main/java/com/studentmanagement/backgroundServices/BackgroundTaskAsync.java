@@ -1,4 +1,4 @@
-package com.studentmanagement.BackgroundTask;
+package com.studentmanagement.backgroundServices;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

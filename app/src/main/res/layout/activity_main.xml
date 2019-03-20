@@ -1,55 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     tools:context=".activity.MainActivity">
 
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycler_view"
+    <android.support.design.widget.TabLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/btn_add_student"
-        android:layout_alignParentTop="true"
-        android:scrollbars="vertical" />
+        android:id="@+id/tab_layout"
+        android:background="@color/colorPrimary"
+        app:tabGravity="fill"
+        app:tabIndicatorColor="@color/colorAccent"
+        app:tabMode="fixed"></android.support.design.widget.TabLayout>
 
-
-    <RelativeLayout
-        android:id="@+id/empty_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true">
-
-        <ImageView
-            android:id="@+id/iv_empty_image"
-            android:layout_width="@dimen/empty_image_width"
-            android:layout_height="@dimen/empty_image_height"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="@dimen/margin_top_empty_image"
-            android:src="@drawable/empty" />
-
-        <ImageView
-            android:id="@+id/iv_empty_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/iv_empty_image"
-            android:layout_centerVertical="true"
-            android:layout_marginTop="@dimen/margin_top_empty_image"
-            android:src="@drawable/text" />
-    </RelativeLayout>
-
-
-    <Button
-        android:id="@+id/btn_add_student"
+    <android.support.v4.view.ViewPager
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="@color/colorAccent"
-        android:padding="@dimen/padding_add_btn"
-        android:text="@string/add_student"
-        android:textColor="@color/button_text"
-        android:textSize="@dimen/btn_text_size"
-        android:textStyle="bold" />
-
-</RelativeLayout>
+        android:id="@+id/view_pager"></android.support.v4.view.ViewPager>
+</LinearLayout>

@@ -14,7 +14,7 @@
     </string-array>
 
     <!--Background Task Array-->
-    <string-array name="Background_Task">
+    <string-array name="background_task_array">
         <item>ASYNC</item>
         <item>SERVICE</item>
         <item>INTENT SERVICE</item>
@@ -52,7 +52,7 @@
     <string name="update_data_editor">Data Updated</string>
     <string name="data_save_async">Data Saved Using Async</string>
     <string name="data_update_async">Data Updated Using Async</string>
-    <string name="data_save_intent_service">Service Started for Saving Data</string>
+    <string name="data_save_intent_service">Service Started..</string>
     <string name="data_update_intent_service">Data Updated Using Service</string>
 
 
@@ -60,4 +60,7 @@
         <item>A-Z</item>
         <item>0-9</item>
     </string-array>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

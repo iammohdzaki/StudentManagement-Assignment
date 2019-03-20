@@ -1,22 +1,28 @@
-package com.studentmanagement.BackgroundTask;
+package com.studentmanagement.backgroundServices;
 
-import android.app.Service;
-import android.content.Context;
+import android.app.IntentService;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.IBinder;
-import android.util.Log;
+import android.widget.Toast;
 
 import com.studentmanagement.constant.Constant;
 import com.studentmanagement.database.DBHelper;
 
-public class BackgroundTaskService extends Service {
+public class IntentServiceBackground extends IntentService {
 
-    public BackgroundTaskService() {
+    public IntentServiceBackground() {
+        super("IntentServiceBackground");
     }
+
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Toast.makeText(this,"Intent Service Started!",Toast.LENGTH_LONG).show();
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    @Override
+    protected void onHandleIntent(Intent intent) {
         String method=intent.getStringExtra(Constant.MODE_TYPE);
         DBHelper dbHelper=new DBHelper(this);
         int id=Integer.parseInt(intent.getStringExtra(Constant.STUDENT_ID));
@@ -37,12 +43,7 @@ public class BackgroundTaskService extends Service {
                 break;
         }
 
-        stopSelf();
-        return START_NOT_STICKY;
     }
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
+
 }

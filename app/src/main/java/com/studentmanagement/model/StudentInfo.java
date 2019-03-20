@@ -7,6 +7,8 @@ public class StudentInfo implements Parcelable {
 
     private String mName,mID;
 
+    public StudentInfo() {
+    }
     public StudentInfo(String mName,String mID){
         this.mID=mID;
         this.mName=mName;
