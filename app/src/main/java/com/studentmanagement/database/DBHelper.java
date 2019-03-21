@@ -86,12 +86,10 @@ public class DBHelper extends SQLiteOpenHelper {
         String selection=StudentEntry.COLUMN_ID +" LIKE ?";
         String[] selectionArgs={String.valueOf(currentPosition)};
 
-        int count=db.update(StudentEntry.TABLE_NAME,
+        db.update(StudentEntry.TABLE_NAME,
                 values,
                 selection,
                 selectionArgs);
-
-        Log.i("UPDATE","ROW UPDATED:"+count);
         db.close();
     }
 

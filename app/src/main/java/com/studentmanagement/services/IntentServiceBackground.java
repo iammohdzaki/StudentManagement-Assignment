@@ -1,4 +1,4 @@
-package com.studentmanagement.backgroundServices;
+package com.studentmanagement.services;
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -30,7 +30,7 @@ public class IntentServiceBackground extends IntentService {
         SQLiteDatabase db=dbHelper.getWritableDatabase();
 
         switch (method){
-            case Constant.MODE_NORMAL:
+            case Constant.MODE_SAVE:
                 dbHelper.insertStudentData(db,id,name);
                 db.close();
                 break;

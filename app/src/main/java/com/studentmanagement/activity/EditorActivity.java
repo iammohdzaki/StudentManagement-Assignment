@@ -6,8 +6,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 
 import com.studentmanagement.R;
+import com.studentmanagement.communicator.Communicator;
 import com.studentmanagement.fragment.EditorFragment;
-import com.studentmanagement.fragmentCommunication.Communicator;
 
 public class EditorActivity extends AppCompatActivity implements Communicator {
 
@@ -48,6 +48,11 @@ public class EditorActivity extends AppCompatActivity implements Communicator {
 
     @Override
     public void updateStudent(Bundle bundleData) {
+
+    }
+
+    @Override
+    public void updateStudentList(Bundle bundleData) {
 
     }
 }

@@ -1,4 +1,4 @@
-package com.studentmanagement.backgroundServices;
+package com.studentmanagement.services;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -14,6 +14,7 @@ public class BackgroundTaskAsync extends AsyncTask<String,Void,String> {
     public BackgroundTaskAsync(Context context){
         this.context=context;
     }
+
     @Override
     protected void onPostExecute(String result) {
     }
@@ -28,7 +29,7 @@ public class BackgroundTaskAsync extends AsyncTask<String,Void,String> {
         String method=strings[0];
         DBHelper dbHelper=new DBHelper(context);
         switch (method){
-            case Constant.MODE_NORMAL:
+            case Constant.MODE_SAVE:
                 int id=Integer.parseInt(strings[1]);
                 String name=strings[2];
                 db=dbHelper.getWritableDatabase();
