@@ -1,11 +1,9 @@
-package com.studentmanagement.BackgroundTask;
+package com.studentmanagement.backgroundTask;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.IBinder;
-import android.util.Log;
 
 import com.studentmanagement.constant.Constant;
 import com.studentmanagement.database.DBHelper;

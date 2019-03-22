@@ -13,9 +13,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.studentmanagement.BackgroundTask.BackgroundTaskAsync;
-import com.studentmanagement.BackgroundTask.BackgroundTaskService;
-import com.studentmanagement.BackgroundTask.IntentServiceBackground;
+import com.studentmanagement.backgroundTask.BackgroundTaskAsync;
+import com.studentmanagement.backgroundTask.BackgroundTaskService;
+import com.studentmanagement.backgroundTask.IntentServiceBackground;
 import com.studentmanagement.R;
 import com.studentmanagement.constant.Constant;
 import com.studentmanagement.model.StudentInfo;

@@ -1,10 +1,8 @@
-package com.studentmanagement.BackgroundTask;
+package com.studentmanagement.backgroundTask;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.studentmanagement.constant.Constant;
