@@ -2,9 +2,13 @@ package com.studentmanagement.backgroundTask;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.widget.Toast;
 
+import com.studentmanagement.R;
 import com.studentmanagement.constant.Constant;
 import com.studentmanagement.database.DBHelper;
 
@@ -17,7 +21,7 @@ public class IntentServiceBackground extends IntentService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Toast.makeText(this,"Intent Service Started!",Toast.LENGTH_LONG).show();
+        //Toast.makeText(this,"Intent Service Started!",Toast.LENGTH_LONG).show();
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -42,6 +46,11 @@ public class IntentServiceBackground extends IntentService {
             default:
                 break;
         }
+
+        intent.setAction(Constant.FILTER_ACTION_KEY);
+        String echoMessage="Intent Service Task Completed";
+        LocalBroadcastManager.getInstance(getApplicationContext())
+                .sendBroadcast(intent.putExtra(Constant.BROADCAST_MESSAGE, echoMessage));
 
     }
 

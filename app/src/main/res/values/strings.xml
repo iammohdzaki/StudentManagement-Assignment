@@ -14,7 +14,7 @@
     </string-array>
 
     <!--Background Task Array-->
-    <string-array name="Background_Task">
+    <string-array name="background_Task">
         <item>ASYNC</item>
         <item>SERVICE</item>
         <item>INTENT SERVICE</item>
@@ -54,6 +54,8 @@
     <string name="data_update_async">Data Updated Using Async</string>
     <string name="data_save_intent_service">Service Started for Saving Data</string>
     <string name="data_update_intent_service">Data Updated Using Service</string>
+    <string name="service_task_completed">Service Task Completed</string>
+    <string name="intent_service_task_completed">Intent Service Task Completed</string>
 
 
     <string-array name="spinner_list_item_array">

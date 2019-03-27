@@ -4,7 +4,9 @@ import android.app.Service;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 
+import com.studentmanagement.R;
 import com.studentmanagement.constant.Constant;
 import com.studentmanagement.database.DBHelper;
 
@@ -35,6 +37,10 @@ public class BackgroundTaskService extends Service {
                 break;
         }
 
+        intent.setAction(Constant.FILTER_ACTION_KEY);
+        String echoMessage="Service Task Completed";
+        LocalBroadcastManager.getInstance(getApplicationContext())
+                .sendBroadcast(intent.putExtra(Constant.BROADCAST_MESSAGE, echoMessage));
         stopSelf();
         return START_NOT_STICKY;
     }

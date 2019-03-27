@@ -1,10 +1,19 @@
 package com.studentmanagement.activity;
 
 import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -26,6 +35,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
+import static com.studentmanagement.constant.Constant.CHANNEL_ID;
 
 
 public class EditorActivity extends AppCompatActivity {
@@ -35,6 +45,7 @@ public class EditorActivity extends AppCompatActivity {
     private TextInputLayout tiName, tiId;
     private BackgroundTaskAsync taskAsync;
     private String[] mBackgroundItems;
+    private ServiceCompleteBroadcast receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +59,7 @@ public class EditorActivity extends AppCompatActivity {
         //Choose Mode in which activity is to be opened
         chooseMode();
 
+
     }
 
     //Init method will initialize all Views
@@ -57,7 +69,7 @@ public class EditorActivity extends AppCompatActivity {
         tiName.setHint(getString(R.string.til_hint_name));
         tiId.setHint(getString(R.string.til_hint_id));
 
-        mBackgroundItems = getResources().getStringArray(R.array.Background_Task);
+        mBackgroundItems = getResources().getStringArray(R.array.background_Task);
 
         etName = findViewById(R.id.et_name);
         etId = findViewById(R.id.et_roll_number);
@@ -252,27 +264,22 @@ public class EditorActivity extends AppCompatActivity {
                         break;
                     case Constant.SERVICE:
                         Intent service = new Intent(EditorActivity.this, BackgroundTaskService.class);
-                        Toast.makeText(EditorActivity.this, "Service Started..", Toast.LENGTH_LONG).show();
                         String current = getIntent().getStringExtra(Constant.STUDENT_ID);
                         service.putExtra(Constant.MODE_TYPE, Constant.MODE_NORMAL);
                         service.putExtra(Constant.STUDENT_NAME, getNameEditText());
                         service.putExtra(Constant.STUDENT_ID, getIdEditText());
                         service.putExtra(Constant.CURRENT_ID, current);
                         startService(service);
-                        finish();
                         dialog.dismiss();
                         break;
                     case Constant.INTENT_SERVICE:
                         Intent intent = new Intent(EditorActivity.this, IntentServiceBackground.class);
-                        Toast.makeText(EditorActivity.this, "Intent Service Started..", Toast.LENGTH_LONG).show();
                         String position = getIntent().getStringExtra(Constant.STUDENT_ID);
-                        Toast.makeText(EditorActivity.this, getString(R.string.data_save_intent_service), Toast.LENGTH_LONG).show();
                         intent.putExtra(Constant.MODE_TYPE, Constant.MODE_NORMAL);
                         intent.putExtra(Constant.STUDENT_NAME, getNameEditText());
                         intent.putExtra(Constant.STUDENT_ID, getIdEditText());
                         intent.putExtra(Constant.CURRENT_ID, position);
                         startService(intent);
-                        finish();
                         dialog.dismiss();
                         break;
                     default:
@@ -282,5 +289,52 @@ public class EditorActivity extends AppCompatActivity {
         });
         AlertDialog alert = mAlertBuilder.create();
         alert.show();
+    }
+
+    @Override
+    protected void onStart() {
+        setReceiver();
+        super.onStart();
+
+    }
+
+    @Override
+    protected void onStop() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+        super.onStop();
+    }
+
+    private void setReceiver(){
+        receiver=new ServiceCompleteBroadcast();
+        IntentFilter filter=new IntentFilter(Constant.FILTER_ACTION_KEY);
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver,filter);
+    }
+
+
+    /**
+     * This class will receive the broadcast message from Services
+     * and Show the notification and Toast
+     */
+    private class ServiceCompleteBroadcast extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            finish();
+            //Show Notification
+            Toast.makeText(EditorActivity.this,"BroadCast:"+intent.getStringExtra(Constant.BROADCAST_MESSAGE),Toast.LENGTH_LONG).show();
+            showNotificationMessage(intent.getStringExtra(Constant.BROADCAST_MESSAGE));
+        }
+
+        /**
+         * Shows the Notification
+         * @param message as Message from Services
+         */
+        private void showNotificationMessage(String message){
+            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(EditorActivity.this);
+            mBuilder.setSmallIcon(R.mipmap.ic_launcher);
+            mBuilder.setContentTitle(message);
+            NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationManager.notify(0, mBuilder.build());
+        }
     }
 }
