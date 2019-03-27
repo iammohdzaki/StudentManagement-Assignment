@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
@@ -330,10 +331,25 @@ public class EditorActivity extends AppCompatActivity {
          * @param message as Message from Services
          */
         private void showNotificationMessage(String message){
+
             NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(EditorActivity.this);
             mBuilder.setSmallIcon(R.mipmap.ic_launcher);
             mBuilder.setContentTitle(message);
             NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
+            {
+                int importance = NotificationManager.IMPORTANCE_HIGH;
+                NotificationChannel notificationChannel = new NotificationChannel(Constant.CHANNEL_ID, "STUDENT_CHANNEL", importance);
+                notificationChannel.enableLights(true);
+                notificationChannel.setLightColor(Color.RED);
+                notificationChannel.enableVibration(true);
+                notificationChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
+                assert mNotificationManager != null;
+                mBuilder.setChannelId(Constant.CHANNEL_ID);
+                mNotificationManager.createNotificationChannel(notificationChannel);
+            }
+
             mNotificationManager.notify(0, mBuilder.build());
         }
     }
