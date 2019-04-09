@@ -56,13 +56,10 @@
     <string name="data_update_intent_service">Data Updated Using Service</string>
 
 
+    <string name="error_string_editor_fragment">Error while Cast</string>
     <string-array name="spinner_list_item_array">
         <item>A-Z</item>
         <item>0-9</item>
     </string-array>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="error_string_editor_fragment">Error in retrieving data. Please try again</string>
-    <string name="student_list">Student List</string>
 </resources>

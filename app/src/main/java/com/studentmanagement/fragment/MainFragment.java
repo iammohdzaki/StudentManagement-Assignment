@@ -167,6 +167,8 @@ public class MainFragment extends Fragment {
                             //View Mode
                             case Constant.VIEW:
                                 Intent intent =new Intent(context, EditorActivity.class);
+                                intent.putExtra(Constant.STUDENT_ID,mStudentList.get(position).getID());
+                                intent.putExtra(Constant.STUDENT_NAME,mStudentList.get(position).getName());
                                 startActivity(intent);
                                 dialog.dismiss();
                                 break;

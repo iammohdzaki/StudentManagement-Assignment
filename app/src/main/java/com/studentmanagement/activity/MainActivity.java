@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements Communicator {
     //Changes the View Pager Title
     public void changeToolbarTitle() {
         if (viewPager.getCurrentItem() == 0) {
-            setTitle(R.string.student_list);
+            setTitle(R.string.add_student);
         } else {
             setTitle(R.string.add_student);
         }

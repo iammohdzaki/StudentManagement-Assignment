@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -351,6 +352,7 @@ public class EditorFragment extends Fragment {
      * @param bundleData as Bundle
      */
     public void viewMode(Bundle bundleData){
+        Log.i("TESTING","NAME:"+bundleData);
         etId.setText(bundleData.getString(Constant.STUDENT_ID));
         etName.setText(bundleData.getString(Constant.STUDENT_NAME));
         btnSaveData.setVisibility(View.GONE);
